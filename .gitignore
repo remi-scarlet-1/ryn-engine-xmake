@@ -1,7 +1,10 @@
 # Xmake cache
 .xmake/
 build/
-generated/
 
 # MacOS Cache
 .DS_Store
+
+# Project
+generated/
+compile_commands.json

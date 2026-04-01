@@ -4,8 +4,8 @@ target("RynEditor")
 
     add_deps("RynRuntime")
 
-    add_includedirs("./Source/")
-    add_headerfiles("./Source/**.h")
+    add_includedirs("./source/")
+    add_headerfiles("./source/**.h")
 
-    --add_files("./Source/**.ixx")
-    add_files("./Source/**.cpp")
+    --add_files("./source/**.ixx")
+    add_files("./source/**.cpp")

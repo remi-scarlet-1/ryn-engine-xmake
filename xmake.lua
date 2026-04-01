@@ -10,9 +10,19 @@ set_policy("build.c++.modules.reuse", true)
 add_rules(
     "mode.debug",
     "mode.release",
-    "mode.releasedbg"
+    "mode.releasedbg",
+    "plugin.compile_commands.autoupdate"
 )
 
+-- Definitions
+if is_mode("debug") then add_defines("RYN_CONFIG_DEBUG") end
+if is_mode("releasedbg") then add_defines("RYN_CONFIG_RELEASE") end
+if is_mode("release") then add_defines("RYN_CONFIG_DIST") end
+
+if is_plat("windows") then add_defines("RYN_PLATFORM_WIN") end
+if is_plat("linux") then add_defines("RYN_PLATFORM_LINUX") end
+
+-- Additional optimizations
 if is_mode("debug") then
     set_fpmodels("precise")
 
