@@ -1,5 +1,24 @@
 #pragma once
 
+/* Shared Library Management */
+#if RYN_PLATFORM_WIN
+    #if RYN_RUNTIME
+        #define RYN_API __declspec(dllexport)
+    #else
+        #define RYN_API __declspec(dllimport)
+    #endif
+
+#elif RYN_PLATFORM_LINUX
+    #if RYN_RUNTIME
+        #define RYN_API __attribute__((visibility("default")))
+    #else
+        #define RYN_API
+    #endif
+
+#else
+    #error "Unknown platform. Shared library exports are undefined for this platform."
+#endif
+
 /* Configuration Features */
 #if RYN_CONFIG_DEBUG
     #define RYN_FEATURE_LOGGING 1

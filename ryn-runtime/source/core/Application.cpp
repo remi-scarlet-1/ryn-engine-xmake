@@ -1,6 +1,5 @@
 module;
 #include "Defines.h"
-#include <cstdio>
 
 module Ryntime.Core;
 
@@ -19,7 +18,7 @@ namespace ryn {
     void IApplication::run(int, char**) {
         RYN_INFO("Initialize...");
         onInit();
-        
+
         RYN_INFO("Start main loop...");
         while (m_Running) {}
 

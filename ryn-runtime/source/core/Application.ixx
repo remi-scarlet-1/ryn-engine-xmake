@@ -5,7 +5,7 @@ export module Ryntime.Core:Application;
 export import Ryntime.Container;
 
 export namespace ryn {
-    class IApplication {
+    class RYN_API IApplication {
     public:
         static void bootstrap(int argc, char** argv, Box<IApplication> appBox);
 

@@ -1,5 +1,5 @@
 target("RynRuntime")
-    set_kind("static")
+    set_kind("shared")
     add_extrafiles("**/xmake.lua", {group = "xmake"})
     
     add_defines("RYN_RUNTIME");
