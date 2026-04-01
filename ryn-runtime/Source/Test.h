@@ -1,0 +1,3 @@
+namespace ryn {
+    void myExample();
+}
