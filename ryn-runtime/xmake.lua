@@ -2,6 +2,8 @@ target("RynRuntime")
     set_kind("static")
     add_extrafiles("**/xmake.lua", {group = "xmake"})
     
+    add_defines("RYN_RUNTIME");
+
     add_includedirs("./source", {public = true})
     add_headerfiles("./source/**.h")
 

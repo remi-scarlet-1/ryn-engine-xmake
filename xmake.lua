@@ -10,9 +10,10 @@ set_policy("build.c++.modules.reuse", true)
 add_rules(
     "mode.debug",
     "mode.release",
-    "mode.releasedbg",
-    "plugin.compile_commands.autoupdate"
+    "mode.releasedbg"
 )
+
+add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
 
 -- Definitions
 if is_mode("debug") then add_defines("RYN_CONFIG_DEBUG") end
