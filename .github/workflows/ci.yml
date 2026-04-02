@@ -3,8 +3,14 @@ name: CI
 on:
   push:
     branches: ["main"]
+    paths-ignore: &shared_ignore
+      - '**.md'
+      - '.clang-format'
+      - '.gitignore'
+      
   pull_request:
     branches: ["main"]
+    paths-ignore: *shared_ignore
 
 jobs:
   build:
@@ -30,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       # Xmake setup
-      - name: Install xmake
+      - name: Install XMake
         uses: xmake-io/github-action-setup-xmake@v1
         with:
           xmake-version: '3.0.8'
@@ -47,21 +53,22 @@ jobs:
           chmod +x llvm.sh
           sudo ./llvm.sh 19 all
 
-      - name: Verify and Set LLVM PATH
-        if: matrix.toolchain == 'Clang'
-        run: |
           LLVM_PATH="/usr/lib/llvm-19/bin"
           if [ -d "$LLVM_PATH" ]; then
-            echo "Directory exists. Adding to GITHUB_PATH..."
+            echo "Found LLVM install directory. Adding to GITHUB_PATH..."
             echo "$LLVM_PATH" >> $GITHUB_PATH
           else
-            echo "::error::LLVM directory $LLVM_PATH not found! Installation may have failed."
+            echo "::error::Couldn't find LLVM install directory at $LLVM_PATH! Installation may have failed."
             exit 1
           fi
-        
+          
       # Build
-      - name: Configure
-        run: xmake f -y ${{ matrix.xmake_flags }}
+      - name: Build Debug
+        run: | 
+          xmake config -y -m debug ${{ matrix.xmake_flags }}
+          xmake build -y
 
-      - name: Build
-        run: xmake build -y
+      - name: Build Release
+        run: | 
+          xmake config -y -m release ${{ matrix.xmake_flags }}
+          xmake build -y
