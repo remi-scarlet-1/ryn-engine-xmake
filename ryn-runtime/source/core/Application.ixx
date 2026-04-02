@@ -13,12 +13,12 @@ export namespace ryn {
         virtual ~IApplication();
 
     protected:
-        virtual void onInit() = 0;
+        virtual void onInit()     = 0;
         virtual void onShutdown() = 0;
 
     private:
         bool m_Running = true;
-        
+
         void run(int argc, char** argv);
     };
 }

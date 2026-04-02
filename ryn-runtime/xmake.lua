@@ -2,7 +2,9 @@ target("RynRuntime")
     set_kind("shared")
     add_extrafiles("**/xmake.lua", {group = "xmake"})
     
-    add_defines("RYN_RUNTIME");
+    add_defines("RYN_RUNTIME")
+
+    add_packages("spdlog", {private = true})
 
     add_includedirs("./source", {public = true})
     add_headerfiles("./source/**.h")

@@ -1,0 +1,70 @@
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Indentation & Spacing
+NamespaceIndentation: All
+IndentWidth: 4
+IndentCaseLabels: true
+TabWidth: 4
+UseTab: Never
+
+# Macro Indentation
+IndentPPDirectives: BeforeHash
+#PPIndentWidth: 4
+
+# The Spacing Fix
+SeparateDefinitionBlocks: Leave
+MaxEmptyLinesToKeep: 1
+
+# Parameter Packing
+BinPackParameters: false
+BinPackArguments: false
+AlignAfterOpenBracket: Align
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Compactness Logic
+ColumnLimit: 140
+AllowShortFunctionsOnASingleLine: All
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: Yes
+
+# Vertical Alignment
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
+AccessModifierOffset: -4
+
+# Penalties
+PenaltyBreakAssignment: 1000
+PenaltyBreakBeforeFirstCallParameter: 1000
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyExcessCharacter: 10
+
+# Pointers & Namespaces
+PointerAlignment: Left
+DerivePointerAlignment: false
+FixNamespaceComments: false
+
+# Braces
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+
+# Modern C++
+Standard: Latest
+SpaceAfterTemplateKeyword: false
+SpaceBeforeSquareBrackets: false
+PackConstructorInitializers: CurrentLine
+RequiresClausePosition: WithPreceding

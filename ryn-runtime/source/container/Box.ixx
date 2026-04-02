@@ -1,9 +1,8 @@
 module;
 #include "Defines.h"
-#include <concepts>
-#include <utility>
 
 export module Ryntime.Container.Box;
+import std;
 
 export namespace ryn {
     /**
@@ -22,14 +21,13 @@ export namespace ryn {
         constexpr ~Box() noexcept { reset(); }
 
         // Disable copy
-        Box(const Box&) = delete;
+        Box(const Box&)            = delete;
         Box& operator=(const Box&) = delete;
 
         // Implement move
-        Box(Box&& other) noexcept : 
-            m_Pointer(std::exchange(other.m_Pointer, nullptr)),
-            m_Deleter(std::exchange(other.m_Deleter, nullptr)) 
-        {}
+        Box(Box&& other) noexcept
+            : m_Pointer(std::exchange(other.m_Pointer, nullptr)),
+              m_Deleter(std::exchange(other.m_Deleter, nullptr)) {}
 
         Box& operator=(Box&& other) noexcept {
             if (this != &other) {
@@ -41,12 +39,11 @@ export namespace ryn {
         }
 
         // Implement converting move
-        template<typename U> 
+        template<typename U>
         requires std::derived_from<U, T>
-        Box(Box<U>&& other) noexcept : 
-            m_Pointer(std::exchange(other.m_Pointer, nullptr)),
-            m_Deleter(std::exchange(other.m_Deleter, nullptr)) 
-        {}
+        Box(Box<U>&& other) noexcept
+            : m_Pointer(std::exchange(other.m_Pointer, nullptr)),
+              m_Deleter(std::exchange(other.m_Deleter, nullptr)) {}
 
         template<typename U>
         requires std::derived_from<U, T>
@@ -84,9 +81,9 @@ export namespace ryn {
         }
 
         // Accessors
-        [[nodiscard]] constexpr T& operator*() const noexcept { return *m_Pointer; }
-        [[nodiscard]] constexpr T* operator->() const noexcept { return m_Pointer; }
-        [[nodiscard]] constexpr T* get() const noexcept { return m_Pointer; }
+        [[nodiscard]] constexpr T&       operator*() const noexcept { return *m_Pointer; }
+        [[nodiscard]] constexpr T*       operator->() const noexcept { return m_Pointer; }
+        [[nodiscard]] constexpr T*       get() const noexcept { return m_Pointer; }
         [[nodiscard]] constexpr explicit operator bool() const noexcept { return m_Pointer != nullptr; }
 
     private:

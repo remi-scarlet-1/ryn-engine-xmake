@@ -1,3 +1,4 @@
+#include "Defines.h"
 #include "Entrypoint.h"
 
 import Ryntime;

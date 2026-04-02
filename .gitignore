@@ -1,3 +1,5 @@
+.idea/
 .vscode/
 .xmake/
 build/
+compile_commands.json
