@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: ${{ matrix.os }} / ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false 
+      matrix:
+        include:
+          - os: Linux
+            runner: ubuntu-latest
+            toolchain: Clang
+            xmake_flags: --toolchain=clang
+
+          - os: Windows
+            runner: windows-latest
+            toolchain: MSVC
+            xmake_flags: --toolchain=msvc
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Xmake setup
+      - name: Install xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: '3.0.8'
+          package-cache: true
+          package-cache-key: 'ubuntu-latest'
+
+      # Build
+      - name: Configure
+        run: xmake f -y ${{ matrix.xmake_flags }}
+
+      - name: Build
+        run: xmake build -y
