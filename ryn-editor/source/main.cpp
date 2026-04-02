@@ -1,5 +1,5 @@
-#include "Defines.h"
-#include "Entrypoint.h"
+#include "defines.h"
+#include "entrypoint.h"
 
 import Ryntime;
 

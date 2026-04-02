@@ -26,7 +26,7 @@ namespace ryn {
 
     void Logger::init() {
         auto color_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        color_sink->set_pattern("%^[%T.%e][%L] [%s(%#) -> %!] %v%$");
+        color_sink->set_pattern("%^[%T.%e][%L][%s(%#)::%!] %v%$");
         s_Logger = std::make_shared<spdlog::logger>("RYN", color_sink);
         s_Logger->flush_on(spdlog::level::err);
 

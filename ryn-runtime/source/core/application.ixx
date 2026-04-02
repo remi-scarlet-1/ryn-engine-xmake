@@ -1,5 +1,5 @@
 module;
-#include "Defines.h"
+#include "defines.h"
 
 export module Ryntime.Core:Application;
 export import Ryntime.Container;

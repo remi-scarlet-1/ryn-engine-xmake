@@ -1,6 +1,6 @@
 module;
 #define RYN_LEAN_AND_MEAN
-#include "Defines.h"
+#include "defines.h"
 #include <spdlog/spdlog.h>
 
 export module Ryntime.Logger;
