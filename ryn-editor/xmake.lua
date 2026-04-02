@@ -6,6 +6,5 @@ target("RynEditor")
 
     add_includedirs("./source/")
     --add_headerfiles("./source/**.h")
-
     --add_files("./source/**.ixx")
     add_files("./source/**.cpp")
