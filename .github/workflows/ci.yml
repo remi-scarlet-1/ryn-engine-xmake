@@ -47,18 +47,17 @@ jobs:
           chmod +x llvm.sh
           sudo ./llvm.sh 19 all
 
-      # Temporary
-      - name: Find LLVM installation
+      - name: Verify and Set LLVM PATH
         if: matrix.toolchain == 'Clang'
         run: |
-          which clang-19 || true
-          find /usr -name "clang-19" 2>/dev/null
-          find /usr/lib -maxdepth 2 -name "llvm*" -type d 2>/dev/null
-          find /usr -name "libc++.modules.json" 2>/dev/null
-
-      #- name: Set Clang PATH
-      #  if: matrix.toolchain == 'Clang'
-      #  run: echo "/usr/lib/llvm-19/bin" >> $GITHUB_PATH
+          LLVM_PATH="/usr/lib/llvm-19/bin"
+          if [ -d "$LLVM_PATH" ]; then
+            echo "Directory exists. Adding to GITHUB_PATH..."
+            echo "$LLVM_PATH" >> $GITHUB_PATH
+          else
+            echo "::error::LLVM directory $LLVM_PATH not found! Installation may have failed."
+            exit 1
+          fi
         
       # Build
       - name: Configure
