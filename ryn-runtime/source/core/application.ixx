@@ -19,6 +19,6 @@ export namespace ryn {
     private:
         bool m_Running = true;
 
-        void run(int argc, char** argv);
+        void main(int argc, char** argv);
     };
 }

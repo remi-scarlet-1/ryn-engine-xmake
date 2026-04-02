@@ -37,6 +37,10 @@
 #endif
 
 /* Common */
+#include <cstdlib>
+#include <cstdint>
+#define RYN_ABORT() abort()
+
 #if _MSC_VER >= 1926
     #define RYN_LINE     __builtin_LINE()
     #define RYN_FILE     __builtin_FILE()
@@ -50,9 +54,6 @@
     #define RYN_FILE     __FILE__
     #define RYN_FUNCTION __func__
 #endif
-
-#include <cstdlib>
-#define RYN_ABORT() abort()
 
 #if _MSC_VER
     #define RYN_DEBUG_BREAK() __debugbreak()

@@ -12,7 +12,7 @@ namespace ryn {
         RYN_INFO("Bootstrapping...");
         RYN_VERIFY(appBox, "Provided app box is invalid!");
 
-        appBox->run(argc, argv);
+        appBox->main(argc, argv);
         appBox.reset();
 
 #if RYN_FEATURE_LOGGING
@@ -23,9 +23,13 @@ namespace ryn {
     IApplication::IApplication()  = default;
     IApplication::~IApplication() = default;
 
-    void IApplication::run(int, char**) {
-        RYN_INFO("Initializing...");
-        onInit();
+    void IApplication::main(int, char**) {
+        {
+            const Timer initTimer;
+            RYN_INFO("Initializing...");
+            onInit();
+            RYN_INFO("Init completed in {0:.3f} second(s)", initTimer.elapsed());
+        }
 
         RYN_INFO("Starting...");
         // TODO: implement main loop
