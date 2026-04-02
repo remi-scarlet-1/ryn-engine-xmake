@@ -10,7 +10,7 @@ UseTab: Never
 
 # Macro Indentation
 IndentPPDirectives: BeforeHash
-#PPIndentWidth: 4
+PPIndentWidth: 4
 
 # The Spacing Fix
 SeparateDefinitionBlocks: Leave

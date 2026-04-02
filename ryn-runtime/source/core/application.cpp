@@ -9,9 +9,8 @@ namespace ryn {
         Logger::init();
 #endif
 
-        RYN_INFO("Bootstrap application...");
+        RYN_INFO("Bootstrapping...");
         RYN_VERIFY(appBox, "Provided app box is invalid!");
-        RYN_WARN("Warning test!");
 
         appBox->run(argc, argv);
         appBox.reset();
@@ -25,10 +24,10 @@ namespace ryn {
     IApplication::~IApplication() = default;
 
     void IApplication::run(int, char**) {
-        RYN_INFO("Initialize...");
+        RYN_INFO("Initializing...");
         onInit();
 
-        RYN_INFO("Start main loop...");
+        RYN_INFO("Starting...");
         // TODO: implement main loop
         // while (m_Running) {}
 
