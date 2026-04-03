@@ -1,8 +1,8 @@
-target("RynEditor")
+target("ryn-editor")
     set_kind("binary")
     add_extrafiles("**/xmake.lua", {group = "xmake"})
 
-    add_deps("RynRuntime")
+    add_deps("ryn-runtime")
 
     add_includedirs("./source/")
     --add_headerfiles("./source/**.h")

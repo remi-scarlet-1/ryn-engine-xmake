@@ -1,4 +1,4 @@
-set_project("RynEngine")
+set_project("ryn-engine")
 set_version("0.0.1")
 
 set_languages("cxx23")
@@ -52,10 +52,6 @@ end
 -- Fetch dependencies
 add_cxflags("-DFMT_USE_LOCALE=0")
 add_requires("spdlog 1.17.0", {configs = {header_only = true}})
-
--- Note: add packages globally instead of per target since any use of them in modules
--- or the public API of the runtime necessitates them being accessible
-add_packages("spdlog")
 
 includes(
     "ryn-runtime", 
