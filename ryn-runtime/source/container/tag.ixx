@@ -1,20 +1,20 @@
 module;
 #include "defines.h"
 
-export module Ryntime.Container.Enum;
+export module Ryntime.Container.Tag;
 
 export namespace ryn {
     /**
-     * @struct  Enum
-     * @brief   An extendable 64-bit enum based on string-hashes.
-     * @tparam  Type The derived concrete enum type.
+     * @struct  Tag
+     * @brief   A 64-bit numerical tag derived from a string hash.
+     * @tparam  Type The derived concrete tag type.
      */
     template<typename Type>
-    struct Enum {
-        consteval Enum() = default;
+    struct Tag {
+        consteval Tag() = default;
 
         template<size_t Length>
-        consteval Enum(const char (&uniqueStr)[Length]) {
+        consteval Tag(const char (&uniqueStr)[Length]) {
             assignHash(uniqueStr, Length - 1);
         }
 
@@ -29,7 +29,7 @@ export namespace ryn {
 
         uint64_t m_Hash = INVALID_HASH;
 
-        consteval Enum(uint64_t rawHash) : m_Hash(rawHash) {}
+        consteval Tag(uint64_t rawHash) : m_Hash(rawHash) {}
 
         consteval void assignHash(const char* uniqueStr, size_t length) {
             uint64_t hash = 0xcbf29ce484222325;
@@ -43,18 +43,18 @@ export namespace ryn {
     };
 
     /**
-     * @struct  NamedEnum
-     * @brief   An extendable enum based on string-hashes that retains it's string name for runtime.
-     * @tparam  Type The derived concrete enum type.
+     * @struct  NamedTag
+     * @brief   A 64-bit numerical tag derived from a string hash that additionally stores it's name during runtime.
+     * @tparam  Type The derived concrete tag type.
      * @tparam  NameBufferSize The size of the internal buffer used to store the name.
      */
     template<typename Type, size_t NameBufferSize = 56>
-    struct NamedEnum : Enum<Type> {
-        consteval NamedEnum() = default;
+    struct NamedTag : Tag<Type> {
+        consteval NamedTag() = default;
 
         template<size_t Length>
         requires(Length <= NameBufferSize)
-        consteval NamedEnum(const char (&uniqueName)[Length]) : Enum<Type>(uniqueName) {
+        consteval NamedTag(const char (&uniqueName)[Length]) : Tag<Type>(uniqueName) {
             assignName(uniqueName, Length);
         }
 
