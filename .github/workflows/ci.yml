@@ -16,6 +16,7 @@ jobs:
   build:
     name: ${{ matrix.os }} / ${{ matrix.toolchain }}
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
 
     strategy:
       fail-fast: false 
@@ -38,12 +39,12 @@ jobs:
       # Xmake setup
       - name: Install XMake
         uses: xmake-io/github-action-setup-xmake@v1
+        timeout-minutes: 3
         with:
           xmake-version: '3.0.8'
           actions-cache-folder: '.xmake-cache'
           actions-cache-key: 'ci-${{ matrix.os }}'
-          package-cache: true
-          package-cache-key: 'ci-${{ matrix.os }}'
+          package-cache: false
 
       # LLVM/Clang setup
       - name: Install LLVM/Clang
