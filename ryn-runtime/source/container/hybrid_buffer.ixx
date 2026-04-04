@@ -116,17 +116,17 @@ export namespace ryn {
         void push_back(const T& value) { emplaceBack(value); }
         void push_back(T&& value) { emplaceBack(std::move(value)); }
 
-        // Accessors
-        [[nodiscard]] constexpr Pointer  data() noexcept { return m_Data; }
-        [[nodiscard]] constexpr SizeType size() const noexcept { return m_Size; }
-        [[nodiscard]] constexpr SizeType capacity() const noexcept { return m_Capacity; }
-        [[nodiscard]] constexpr bool     isEmpty() const noexcept { return m_Size == 0; }
-
         // STL iterators
         [[nodiscard]] constexpr Pointer      begin() noexcept { return m_Data; }
         [[nodiscard]] constexpr ConstPointer begin() const noexcept { return m_Data; }
         [[nodiscard]] constexpr Pointer      end() noexcept { return m_Data + m_Size; }
         [[nodiscard]] constexpr ConstPointer end() const noexcept { return m_Data + m_Size; }
+
+        // Accessors
+        [[nodiscard]] constexpr Pointer  getData() noexcept { return m_Data; }
+        [[nodiscard]] constexpr SizeType getSize() const noexcept { return m_Size; }
+        [[nodiscard]] constexpr SizeType getCapacity() const noexcept { return m_Capacity; }
+        [[nodiscard]] constexpr bool     isEmpty() const noexcept { return m_Size == 0; }
 
     private:
         [[nodiscard]] constexpr bool isHeap() const noexcept { return m_Capacity > StackCapacity; }

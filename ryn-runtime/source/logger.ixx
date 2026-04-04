@@ -32,7 +32,7 @@ export namespace ryn {
             HybridBuffer<char, 1024> buffer;
             std::vformat_to(std::back_inserter(buffer), fmt.get(), std::make_format_args(args...));
             buffer.push_back('\0');
-            dispatch(meta, buffer.data());
+            dispatch(meta, buffer.getData());
         }
 
     private:
