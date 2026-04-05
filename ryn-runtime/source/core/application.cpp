@@ -2,6 +2,7 @@ module;
 #include "defines.h"
 
 module Ryntime.Core;
+import Ryntime.Reflection;
 
 namespace ryn {
     void IApplication::bootstrap(int argc, char** argv, Box<IApplication> appBox) {
@@ -12,6 +13,7 @@ namespace ryn {
         RYN_INFO("Bootstrapping...");
         RYN_VERIFY(appBox, "Provided app box is invalid!");
 
+        TypeRegistry::rebuild();
         appBox->main(argc, argv);
         appBox.reset();
 
