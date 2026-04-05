@@ -2,44 +2,61 @@ module;
 #include "defines.h"
 
 export module Ryntime.Container.Tag;
+export import Ryntime.Util.Hash;
+import std;
 
 export namespace ryn {
+    /**
+     * @struct  TagHash
+     * @brief   The underlying 64-bit numerical value of a Tag.
+     */
+    template<typename>
+    struct TagHash {
+        using ValueType                    = uint64_t;
+        static constexpr ValueType INVALID = 0xDEADBEEFDEADBEEFull;
+
+        ValueType Value = INVALID;
+
+        explicit constexpr operator bool() const { return Value != INVALID; }
+        constexpr bool     operator==(const TagHash&) const  = default;
+        constexpr auto     operator<=>(const TagHash&) const = default;
+    };
+
+    template<typename T>
+    struct hasher<TagHash<T>> {
+        constexpr size_t operator()(const TagHash<T>& tag) const noexcept { return std::hash<uint64_t>{}(tag.Value); }
+    };
+
     /**
      * @struct  Tag
      * @brief   A 64-bit numerical tag derived from a string hash.
      * @tparam  Type The derived concrete tag type.
+     * @warning Setting the `Hash` member manually is highly discouraged!
      */
     template<typename Type>
     struct Tag {
+        using HashType = TagHash<Type>;
+        HashType Hash{};
+
         consteval Tag() = default;
 
         template<size_t Length>
         consteval Tag(const char (&uniqueStr)[Length]) {
-            assignHash(uniqueStr, Length - 1);
-        }
+            static_assert(std::is_same_v<typename HashType::ValueType, uint64_t>);
 
-        constexpr uint64_t getHash() const { return m_Hash; }
-        explicit constexpr operator bool() const { return m_Hash != INVALID_HASH; }
-
-        constexpr bool operator==(const Type& other) const { return m_Hash == other.m_Hash; }
-        constexpr auto operator<=>(const Type& other) const { return m_Hash <=> other.m_Hash; }
-
-    private:
-        static constexpr uint64_t INVALID_HASH = 0xDEADBEEFDEADBEEFull;
-
-        uint64_t m_Hash = INVALID_HASH;
-
-        consteval Tag(uint64_t rawHash) : m_Hash(rawHash) {}
-
-        consteval void assignHash(const char* uniqueStr, size_t length) {
             uint64_t hash = 0xcbf29ce484222325;
-            for (size_t i = 0; i < length; i++) {
+            for (size_t i = 0; i < Length - 1; i++) {
                 hash ^= static_cast<uint64_t>(uniqueStr[i]);
                 hash *= 0x100000001b3;
             }
-            if (hash == INVALID_HASH) throw "Hash collision with INVALID_HASH!";
-            m_Hash = hash;
+
+            if (hash == HashType::INVALID) throw "Hash collision with HashType::INVALID!";
+            Hash.Value = hash;
         }
+
+        explicit constexpr operator bool() const { return static_cast<bool>(Hash); }
+        constexpr bool     operator==(const Type& other) const { return Hash == other.Hash; }
+        constexpr auto     operator<=>(const Type& other) const { return Hash <=> other.Hash; }
     };
 
     /**
@@ -47,26 +64,19 @@ export namespace ryn {
      * @brief   A 64-bit numerical tag derived from a string hash that additionally stores it's name during runtime.
      * @tparam  Type The derived concrete tag type.
      * @tparam  NameBufferSize The size of the internal buffer used to store the name.
+     * @warning Setting the `Hash` and `Name` members manually is highly discouraged!
      */
     template<typename Type, size_t NameBufferSize = 56>
     struct NamedTag : Tag<Type> {
+        char Name[NameBufferSize]{};
+
         consteval NamedTag() = default;
 
         template<size_t Length>
         requires(Length <= NameBufferSize)
         consteval NamedTag(const char (&uniqueName)[Length]) : Tag<Type>(uniqueName) {
-            assignName(uniqueName, Length);
-        }
-
-        constexpr const char* getName() const { return m_Name; }
-
-    private:
-        char m_Name[NameBufferSize] = {};
-
-        consteval void assignName(const char* name, size_t length) {
-            for (size_t i = 0; i < length && i < NameBufferSize; ++i)
-                m_Name[i] = name[i];
-            m_Name[NameBufferSize - 1] = '\0';
+            for (size_t i = 0; i < Length && i < NameBufferSize; ++i) Name[i] = uniqueName[i];
+            Name[NameBufferSize - 1] = '\0';
         }
     };
 }
