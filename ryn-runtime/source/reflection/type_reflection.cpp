@@ -2,6 +2,7 @@ module;
 #include "defines.h"
 
 module Ryntime.Reflection;
+import Ryntime.Container.Timer;
 import std;
 
 namespace ryn {
@@ -24,9 +25,12 @@ namespace ryn {
             return;
         }
 
+        RYN_INFO("Rebuilding...");
+        const Timer timer;
+
         const size_t totalCount   = self.m_Types.size() + self.m_PendingTypes.size();
         const size_t pendingCount = self.m_PendingTypes.size();
-        RYN_INFO("Rebuilding... Found {} pending types to reconcile.", pendingCount);
+        RYN_INFO("Found {} pending types to reconcile.", pendingCount);
 
         // Gather pointers to all TypeInfos
         std::vector<const TypeInfo*> sortBuffer;
@@ -82,8 +86,10 @@ namespace ryn {
 
         self.m_IsDirty.store(false, std::memory_order_release);
 
-        // TODO: add timer to know how long the rebuild took
-        RYN_INFO("Rebuild complete. Total Types: {}, Total Categories: {}.", self.m_Types.size(), categoryCount);
+        RYN_INFO("Rebuild {} Types and {} Categories within {:.3f} ms.",
+                 self.m_Types.size(),
+                 categoryCount,
+                 timer.elapsedMilliSeconds());
     }
 
     void TypeRegistry::registerType(TypeInfo typeInfo) {
