@@ -42,7 +42,7 @@ namespace ryn {
         // Sort the TypeInfo pointers by Category and Hash
         std::ranges::sort(sortBuffer, [](const TypeInfo* a, const TypeInfo* b) {
             if (a->Category.Hash != b->Category.Hash) return a->Category.Hash < b->Category.Hash;
-            return a->Identity.Hash < b->Identity.Hash;
+            return a->Id.Hash < b->Id.Hash;
         });
 
         // Construct a new packed vector of the sorted TypeInfos
@@ -54,9 +54,9 @@ namespace ryn {
         self.m_Types.swap(newTypes);
         self.m_PendingTypes.clear();
 
-        // Rebuild m_ByIdentity and m_ByCategory
-        self.m_ByIdentityHash.clear();
-        self.m_ByCategoryHash.clear();
+        // Rebuild m_ById and m_ByCategory
+        self.m_ById.clear();
+        self.m_ByCategory.clear();
 
         size_t rangeStart    = 0;
         size_t categoryCount = 0;
@@ -64,8 +64,8 @@ namespace ryn {
         for (size_t i = 0; i < self.m_Types.size(); i++) {
             const auto& current = self.m_Types[i];
 
-            // Map the Identity to the vector index
-            self.m_ByIdentityHash[current.Identity.Hash] = i;
+            // Map the id to the vector index
+            self.m_ById[current.Id] = i;
 
             // Determine if we've reached the end of a category block
             bool isLast          = (i == self.m_Types.size() - 1);
@@ -74,7 +74,7 @@ namespace ryn {
             if (isLast || nextIsDifferent) {
                 size_t count = (i - rangeStart) + 1;
                 // Create a span pointing to the slice of the vector
-                self.m_ByCategoryHash[current.Category.Hash] = ReadonlySpan(&self.m_Types[rangeStart], count);
+                self.m_ByCategory[current.Category] = ReadonlySpan(&self.m_Types[rangeStart], count);
 
                 // Log the category slice just discovered
                 RYN_TRACE("Registered category '{}' with {} types.", current.Category, count);
@@ -106,16 +106,16 @@ namespace ryn {
     "TypeRegistry::rebuild() but be aware that this operation invalidates all past query results and should therefore be only "            \
     "invoked inbetween frames."
 
-    const TypeInfo& TypeRegistry::queryType(const TypeIdentity& identity) {
+    const TypeInfo& TypeRegistry::queryType(const TypeId& id) {
         TypeRegistry& self = getInstance();
         if (self.m_IsDirty.load(std::memory_order_acquire)) RYN_WARN(DIRTY_WARNING_MSG);
         std::shared_lock lock(self.m_QueryMutex);
 
-        auto it = self.m_ByIdentityHash.find(identity.Hash);
-        if (it != self.m_ByIdentityHash.end()) return self.m_Types[it->second];
+        auto it = self.m_ById.find(id);
+        if (it != self.m_ById.end()) return self.m_Types[it->second];
 
-        RYN_ERROR("Type info for TypeIdentity: {} was not found!", identity);
-        static TypeInfo s_InvalidInfo(TypeIdentity::Invalid, TypeCategory::None);
+        RYN_ERROR("Type info for TypeId: {} was not found!", id);
+        static TypeInfo s_InvalidInfo(TypeId::Invalid, TypeCategory::None);
         return s_InvalidInfo;
     }
 
@@ -124,8 +124,8 @@ namespace ryn {
         if (self.m_IsDirty.load(std::memory_order_acquire)) RYN_WARN(DIRTY_WARNING_MSG);
         std::shared_lock lock(self.m_QueryMutex);
 
-        auto it = self.m_ByCategoryHash.find(category.Hash);
-        if (it == self.m_ByCategoryHash.end()) return ReadonlySpan<TypeInfo>();
+        auto it = self.m_ByCategory.find(category);
+        if (it == self.m_ByCategory.end()) return ReadonlySpan<TypeInfo>();
         return it->second;
     }
 }

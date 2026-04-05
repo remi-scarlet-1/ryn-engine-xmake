@@ -33,7 +33,7 @@ export namespace ryn {
         template<typename T, typename Func>
         requires IsEvent<T> && IsType<T>
         inline bool match(const Func& func) {
-            if (m_Event.getTypeIdentity() == T::TYPE_IDENTITY) {
+            if (m_Event.getTypeId() == T::TYPE_ID) {
                 func(static_cast<T&>(m_Event));
                 return true;
             }

@@ -10,7 +10,7 @@ namespace ryn {
     class RYN_API ITypeReflection {
     public:
         virtual ~ITypeReflection();
-        [[nodiscard]] virtual const TypeIdentity& getTypeIdentity() const = 0;
+        [[nodiscard]] virtual const TypeId&       getTypeId() const       = 0;
         [[nodiscard]] virtual const TypeCategory& getTypeCategory() const = 0;
     };
 }
@@ -30,20 +30,23 @@ export namespace ryn {
         static void rebuild();
         static void registerType(TypeInfo typeInfo);
 
-        [[nodiscard]] static const TypeInfo&        queryType(const TypeIdentity& identity);
+        [[nodiscard]] static const TypeInfo&        queryType(const TypeId& id);
         [[nodiscard]] static ReadonlySpan<TypeInfo> queryTypeByCategory(const TypeCategory& category);
 
     private:
         TypeRegistry();
         ~TypeRegistry();
 
-        mutable std::shared_mutex                               m_QueryMutex;
-        mutable std::mutex                                      m_RegisterMutex;
-        std::atomic<bool>                                       m_IsDirty{false};
-        std::vector<TypeInfo>                                   m_Types;
-        std::vector<TypeInfo>                                   m_PendingTypes;
-        HashMap<TypeIdentity::HashType, size_t>                 m_ByIdentityHash;
-        HashMap<TypeCategory::HashType, ReadonlySpan<TypeInfo>> m_ByCategoryHash;
+        std::atomic<bool> m_IsDirty{false};
+
+        mutable std::shared_mutex m_QueryMutex;
+        mutable std::mutex        m_RegisterMutex;
+
+        std::vector<TypeInfo> m_Types;
+        std::vector<TypeInfo> m_PendingTypes;
+
+        HashMap<TypeId, size_t>                       m_ById;
+        HashMap<TypeCategory, ReadonlySpan<TypeInfo>> m_ByCategory;
     };
 
     template<typename T>
@@ -63,18 +66,18 @@ export namespace ryn {
      * @brief   Mixin for non-virtual type reflection.
      * @details Uses CRTP to provide static constexpr type metadata without overhead or virtual tables.
      * @tparam  Category The types classification (e.g., Component, System, Event).
-     * @tparam  Name The unique string identifier used to generate the type's identity.
+     * @tparam  Name The unique string identifier used to generate the type's id.
      */
     template<TypeCategory Category, TypeName Name>
     struct StaticType {
         using MarkStaticType = void;
 
-        static constexpr auto        TYPE_IDENTITY = TypeIdentity(Name.data());
+        static constexpr auto        TYPE_ID       = TypeId(Name.data());
         static constexpr auto        TYPE_CATEGORY = Category;
         static constexpr const char* TYPE_NAME     = Name.data;
 
         static bool registerType() {
-            TypeRegistry::registerType(TypeInfo(TYPE_IDENTITY, TYPE_CATEGORY));
+            TypeRegistry::registerType(TypeInfo(TYPE_ID, TYPE_CATEGORY));
             return true;
         }
     };
@@ -100,7 +103,7 @@ export namespace ryn {
      * @brief   Final implementation leaf for polymorphic reflected types.
      * @details Bridges DynamicBase and StaticType to implement the dynamic reflection contract.
      * @tparam  Base The DynamicBase providing the shared category metadata.
-     * @tparam  Name The unique string identifier used to generate the type's identity.
+     * @tparam  Name The unique string identifier used to generate the type's id.
      */
     template<IsDynamicBase Base, TypeName Name>
     class DynamicType : public Base, public StaticType<Base::TYPE_CATEGORY, Name> {
@@ -110,11 +113,11 @@ export namespace ryn {
 
         using Meta::registerType;
         using Meta::TYPE_CATEGORY;
-        using Meta::TYPE_IDENTITY;
+        using Meta::TYPE_ID;
         using Meta::TYPE_NAME;
 
-        [[nodiscard]] const TypeIdentity& getTypeIdentity() const final { return TYPE_IDENTITY; }
-        [[nodiscard]] const char*         getTypeName() const final { return TYPE_NAME; }
+        [[nodiscard]] const TypeId& getTypeId() const final { return TYPE_ID; }
+        [[nodiscard]] const char*   getTypeName() const final { return TYPE_NAME; }
 
     protected:
         constexpr DynamicType() noexcept { (void)s_Registered; }

@@ -7,76 +7,62 @@ import std;
 
 export namespace ryn {
     /**
-     * @struct  TagHash
-     * @brief   The underlying 64-bit numerical value of a Tag.
-     */
-    template<typename>
-    struct TagHash {
-        using ValueType                    = uint64_t;
-        static constexpr ValueType INVALID = 0xDEADBEEFDEADBEEFull;
-
-        ValueType Value = INVALID;
-
-        explicit constexpr operator bool() const { return Value != INVALID; }
-        constexpr bool     operator==(const TagHash&) const  = default;
-        constexpr auto     operator<=>(const TagHash&) const = default;
-    };
-
-    template<typename T>
-    struct Hasher<TagHash<T>> {
-        constexpr size_t operator()(const TagHash<T>& tag) const noexcept { return std::hash<uint64_t>{}(tag.Value); }
-    };
-
-    /**
      * @struct  Tag
-     * @brief   A 64-bit numerical tag derived from a string hash.
-     * @tparam  Type The derived concrete tag type.
-     * @warning Setting the `Hash` member manually is highly discouraged!
+     * @brief   An 8-byte tag carrying a unique hash derived at compile time.
+     * @tparam  Discriminator The derived concrete tag type.
+     * @warning Overwriting the `Hash` member manually is highly discouraged!
      */
-    template<typename Type>
+    template<typename Discriminator>
     struct Tag {
-        using HashType = TagHash<Type>;
-        HashType Hash{};
+        using ValueType                         = uint64_t;
+        static constexpr ValueType INVALID_HASH = 0xDEADBEEFDEADBEEFull;
+        ValueType                  Hash         = INVALID_HASH;
 
         consteval Tag() = default;
 
         template<size_t Length>
-        consteval Tag(const char (&uniqueStr)[Length]) {
-            static_assert(std::is_same_v<typename HashType::ValueType, uint64_t>);
+        consteval Tag(const char (&uniqueName)[Length]) {
+            static_assert(std::is_same_v<ValueType, uint64_t>, "Tag hash algorithm requires 64-bit uint.");
 
             uint64_t hash = 0xcbf29ce484222325;
             for (size_t i = 0; i < Length - 1; i++) {
-                hash ^= static_cast<uint64_t>(uniqueStr[i]);
+                hash ^= static_cast<uint64_t>(uniqueName[i]);
                 hash *= 0x100000001b3;
             }
 
-            if (hash == HashType::INVALID) throw "Hash collision with HashType::INVALID!";
-            Hash.Value = hash;
+            if (hash == INVALID_HASH) throw "Hash collision with INVALID!";
+            Hash = hash;
         }
 
-        explicit constexpr operator bool() const { return static_cast<bool>(Hash); }
-        constexpr bool     operator==(const Type& other) const { return Hash == other.Hash; }
-        constexpr auto     operator<=>(const Type& other) const { return Hash <=> other.Hash; }
+        explicit constexpr    operator bool() const { return Hash != INVALID_HASH; }
+        friend constexpr bool operator==(const Tag&, const Tag&)  = default;
+        friend constexpr auto operator<=>(const Tag&, const Tag&) = default;
     };
 
     /**
      * @struct  NamedTag
-     * @brief   A 64-bit numerical tag derived from a string hash that additionally stores it's name during runtime.
-     * @tparam  Type The derived concrete tag type.
-     * @tparam  NameBufferSize The size of the internal buffer used to store the name.
+     * @brief   A 16-byte tag carrying a unique name and hash derived at compile time.
+     * @tparam  Discriminator The derived concrete tag type.
      * @warning Setting the `Hash` and `Name` members manually is highly discouraged!
      */
-    template<typename Type, size_t NameBufferSize = 56>
-    struct NamedTag : Tag<Type> {
-        char Name[NameBufferSize]{};
+    template<typename Discriminator>
+    struct NamedTag : Tag<Discriminator> {
+        const char* Name = "<unknown>";
 
         consteval NamedTag() = default;
 
         template<size_t Length>
-        requires(Length <= NameBufferSize)
-        consteval NamedTag(const char (&uniqueName)[Length]) : Tag<Type>(uniqueName) {
-            for (size_t i = 0; i < Length && i < NameBufferSize; ++i) Name[i] = uniqueName[i];
-            Name[NameBufferSize - 1] = '\0';
-        }
+        consteval NamedTag(const char (&uniqueName)[Length]) : Tag<Discriminator>(uniqueName),
+                                                               Name(uniqueName) {}
+    };
+
+    template<typename T>
+    concept IsTag = std::derived_from<T, Tag<T>> && requires(const T& tag) {
+        { tag.Hash } -> std::convertible_to<uint64_t>;
+    };
+
+    template<IsTag T>
+    struct Hasher<T> {
+        constexpr size_t operator()(const T& tag) const noexcept { return static_cast<size_t>(tag.Hash); }
     };
 }

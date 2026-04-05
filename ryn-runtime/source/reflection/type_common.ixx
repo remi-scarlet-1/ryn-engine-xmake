@@ -10,18 +10,17 @@ export namespace ryn {
     struct TypeName {
         char value[N]{};
         consteval TypeName(const char (&str)[N]) {
-            for (size_t i = 0; i < N; ++i)
-                value[i] = str[i];
+            for (size_t i = 0; i < N; ++i) value[i] = str[i];
         }
         [[nodiscard]] constexpr const char* data() const { return value; }
     };
 
-    struct TypeIdentity : NamedTag<TypeIdentity> {
-        /* Invalid identity used as substitution in return statements on errors */
-        static const TypeIdentity Invalid;
+    struct TypeId : NamedTag<TypeId> {
+        /* Invalid id used as substitution in return statements on errors */
+        static const TypeId Invalid;
     };
 
-    constexpr TypeIdentity TypeIdentity::Invalid{};
+    constexpr TypeId TypeId::Invalid{};
 
     struct TypeCategory : NamedTag<TypeCategory> {
         /* Well known engine type categories */
@@ -41,27 +40,25 @@ export namespace ryn {
     constexpr TypeCategory TypeCategory::ComponentRequest{"Ryn.ComponentRequest"};
 
     struct TypeInfo {
-        const TypeIdentity& Identity;
+        const TypeId&       Id;
         const TypeCategory& Category;
 
         TypeInfo() = delete;
-        TypeInfo(const TypeIdentity& identity, const TypeCategory& category) : Identity(identity), Category(category) {}
+        TypeInfo(const TypeId& id, const TypeCategory& category) : Id(id), Category(category) {}
     };
 }
 
 template<>
-struct std::formatter<ryn::TypeIdentity> {
+struct std::formatter<ryn::TypeId> {
     constexpr auto parse(const format_parse_context& ctx) const { return ctx.begin(); }
-    inline auto    format(const ryn::TypeIdentity& identity, format_context& ctx) const {
-        return format_to(ctx.out(), "({}, 0x{:X})", identity.Name, identity.Hash.Value);
-    }
+    inline auto format(const ryn::TypeId& id, format_context& ctx) const { return format_to(ctx.out(), "({}, 0x{:X})", id.Name, id.Hash); }
 };
 
 template<>
 struct std::formatter<ryn::TypeCategory> {
     constexpr auto parse(const format_parse_context& ctx) const { return ctx.begin(); }
     inline auto    format(const ryn::TypeCategory& category, format_context& ctx) const {
-        return format_to(ctx.out(), "({}, 0x{:X})", category.Name, category.Hash.Value);
+        return format_to(ctx.out(), "({}, 0x{:X})", category.Name, category.Hash);
     }
 };
 
@@ -69,6 +66,6 @@ template<>
 struct std::formatter<ryn::TypeInfo> {
     constexpr auto parse(const format_parse_context& ctx) const { return ctx.begin(); }
     inline auto    format(const ryn::TypeInfo& info, format_context& ctx) const {
-        return format_to(ctx.out(), "[Identity: {}, Category: {}]", info.Identity, info.Category);
+        return format_to(ctx.out(), "[Id: {}, Category: {}]", info.Id, info.Category);
     }
 };
