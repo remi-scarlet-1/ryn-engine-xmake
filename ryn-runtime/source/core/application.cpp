@@ -2,6 +2,7 @@ module;
 #include "defines.h"
 
 module Ryntime.Core;
+import Ryntime.Container.Timer;
 import Ryntime.Reflection;
 
 namespace ryn {
@@ -28,12 +29,12 @@ namespace ryn {
     void IApplication::main(int, char**) {
         {
             const Timer initTimer;
-            RYN_INFO("Initializing...");
+            RYN_INFO("Initialize...");
             onInit();
-            RYN_INFO("Init completed in {0:.3f} second(s)", initTimer.elapsed());
+            RYN_INFO("Init completed in {:.3f} ms", initTimer.elapsedMilliSeconds());
         }
 
-        RYN_INFO("Starting...");
+        RYN_INFO("Start...");
         // TODO: implement main loop
         // while (m_Running) {}
 

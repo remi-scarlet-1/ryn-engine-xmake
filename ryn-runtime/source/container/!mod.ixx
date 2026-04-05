@@ -4,3 +4,4 @@ export import Ryntime.Container.Hash;
 export import Ryntime.Container.HybridBuffer;
 export import Ryntime.Container.Span;
 export import Ryntime.Container.Tag;
+export import Ryntime.Container.Timer;
