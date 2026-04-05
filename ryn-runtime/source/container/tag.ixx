@@ -2,7 +2,7 @@ module;
 #include "defines.h"
 
 export module Ryntime.Container.Tag;
-export import Ryntime.Util.Hash;
+export import Ryntime.Container.Hash;
 import std;
 
 export namespace ryn {
@@ -23,7 +23,7 @@ export namespace ryn {
     };
 
     template<typename T>
-    struct hasher<TagHash<T>> {
+    struct Hasher<TagHash<T>> {
         constexpr size_t operator()(const TagHash<T>& tag) const noexcept { return std::hash<uint64_t>{}(tag.Value); }
     };
 

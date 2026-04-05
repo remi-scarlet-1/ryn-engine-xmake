@@ -1,12 +1,12 @@
 module;
 #include "defines.h"
 
-export module Ryntime.Util.Hash;
+export module Ryntime.Container.Hash;
 import std;
 
 export namespace ryn {
     template<typename T>
-    struct hasher {
+    struct Hasher {
         constexpr size_t operator()(const T& value) const noexcept { return std::hash<T>()(value); }
     };
 
@@ -15,7 +15,7 @@ export namespace ryn {
 
         template<typename T>
         constexpr size_t operator()(const T& value) const noexcept {
-            return hasher<T>{}(value);
+            return Hasher<T>{}(value);
         }
     };
 
