@@ -2,6 +2,7 @@ module;
 #include "defines.h"
 
 module Ryntime.Core;
+import Ryntime.Container.Span;
 
 namespace ryn {
     IService::~IService()               = default;
@@ -40,12 +41,12 @@ namespace ryn {
         m_FrameContext.Time.Delta = m_FrameTimer.elapsedSeconds();
         m_FrameTimer.reset();
 
-        for (const auto& serviceBox : m_Services) serviceBox->onBeginFrame(m_FrameContext);
-
-        for (const auto& serviceBox : m_Services) serviceBox->onUpdate(m_FrameContext);
+        auto view = Span(m_Services);
+        for (auto& service : view) service->onBeginFrame(m_FrameContext);
+        for (auto& service : view) service->onUpdate(m_FrameContext);
 
         // Reversed iteration for onEndFrame()
-        for (auto it = m_Services.rbegin(); it != m_Services.rend(); ++it) (*it)->onEndFrame(m_FrameContext);
+        for (auto& service : std::views::reverse(view)) service->onEndFrame(m_FrameContext);
     }
 
     void ServiceStack::dispatchEvent(IEvent& event) {

@@ -20,6 +20,7 @@ export namespace ryn {
 
         constexpr Span() noexcept = default;
         constexpr Span(T* data, size_t count) noexcept : m_Data(data), m_Count(count) {}
+        constexpr Span(std::vector<T>& vector) noexcept : m_Data(vector.data()), m_Count(vector.size()) {}
 
         // STL iterators
         [[nodiscard]] constexpr ElementPtr begin() noexcept { return m_Data; }
