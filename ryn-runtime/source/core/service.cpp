@@ -44,9 +44,7 @@ namespace ryn {
         auto view = Span(m_Services);
         for (auto& service : view) service->onBeginFrame(m_FrameContext);
         for (auto& service : view) service->onUpdate(m_FrameContext);
-
-        // Reversed iteration for onEndFrame()
-        for (auto& service : std::views::reverse(view)) service->onEndFrame(m_FrameContext);
+        for (auto& service : view.reversed()) service->onEndFrame(m_FrameContext);
     }
 
     void ServiceStack::dispatchEvent(IEvent& event) {

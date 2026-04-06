@@ -36,6 +36,25 @@ export namespace ryn {
             return m_Data[index];
         }
 
+        struct ReverseView {
+            T*     m_Data;
+            size_t m_Count;
+
+            // clang-format off
+            struct Iterator {
+                T* ptr;
+                constexpr T& operator*() const { return *(ptr - 1); } // Offset by 1
+                constexpr Iterator& operator++() { --ptr; return *this; }
+                constexpr bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
+            };
+            // clang-format on
+
+            constexpr Iterator begin() const { return {m_Data + m_Count}; }
+            constexpr Iterator end() const { return {m_Data}; }
+        };
+
+        [[nodiscard]] constexpr ReverseView reversed() const noexcept { return {m_Data, m_Count}; }
+
     private:
         T*     m_Data  = nullptr;
         size_t m_Count = 0;
