@@ -23,8 +23,14 @@ namespace ryn {
 #endif
     }
 
-    IApplication::IApplication()  = default;
+    IApplication::IApplication() {
+        m_ServiceStack.setEventInterceptor([this](auto& listener) { this->onEventIntercept(listener); });
+    }
+
     IApplication::~IApplication() = default;
+
+    IServiceStack&   IApplication::getServiceStack() { return m_ServiceStack; }
+    IServiceLocator& IApplication::getServiceLocator() { return m_ServiceStack; }
 
     void IApplication::main(int, char**) {
         {
@@ -35,10 +41,17 @@ namespace ryn {
         }
 
         RYN_INFO("Start...");
-        // TODO: implement main loop
-        // while (m_Running) {}
+        while (m_Running) m_ServiceStack.update();
 
         RYN_INFO("Shutdown...");
         onShutdown();
+    }
+
+    void IApplication::onEventIntercept(EventListener& listener) {
+        // TODO: wire up events that should cause application shutdown
+        // listener.match<event::WindowClose>([this](event::WindowClose& event) {
+        //     m_Running = false;
+        //     event.consume();
+        // });
     }
 }

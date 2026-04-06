@@ -3,14 +3,10 @@ module;
 
 export module Ryntime.Core:Application;
 export import Ryntime.Container;
+export import :Event;
+export import :Service;
 
 export namespace ryn {
-    struct FrameTime {
-        double   Total      = 0.0;
-        double   Delta      = 0.0;
-        uint64_t FrameCount = 0;
-    };
-
     class RYN_API IApplication {
     public:
         static void bootstrap(int argc, char** argv, Box<IApplication> appBox);
@@ -22,9 +18,14 @@ export namespace ryn {
         virtual void onInit()     = 0;
         virtual void onShutdown() = 0;
 
+        [[nodiscard]] IServiceStack&   getServiceStack();
+        [[nodiscard]] IServiceLocator& getServiceLocator();
+
     private:
-        bool m_Running = true;
+        bool         m_Running = true;
+        ServiceStack m_ServiceStack;
 
         void main(int argc, char** argv);
+        void onEventIntercept(EventListener& listener);
     };
 }
