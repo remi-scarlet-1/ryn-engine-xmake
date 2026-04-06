@@ -3,6 +3,7 @@ module;
 
 module Ryntime.Core;
 import Ryntime.Container.Span;
+import std;
 
 namespace ryn {
     IService::~IService()               = default;
@@ -57,9 +58,10 @@ namespace ryn {
         }
 
         // Propagate event top to bottom through services
-        for (auto it = m_Services.rbegin(); it != m_Services.rend(); ++it) {
+        auto view = Span(m_Services);
+        for (auto& service : view.reversed()) {
             if (event.isConsumed()) break;
-            (*it)->onEvent(listener);
+            service->onEvent(listener);
         }
 
         // Be chatty about events that weren't consumed
