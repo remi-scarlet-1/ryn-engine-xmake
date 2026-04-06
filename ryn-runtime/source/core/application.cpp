@@ -49,7 +49,9 @@ namespace ryn {
 
     void IApplication::onEventIntercept(EventListener& listener) {
         // TODO: wire up events that should cause application shutdown
-        // listener.match<event::WindowClose>([this](event::WindowClose& event) {
+        //  the application shouldn't know of any events specific to default systems, rather it should implement a ApplicationClose event
+        //  and only wire that up. Any services looking to close the application should dispatch it instead.
+        // listener.match<...>([this](...& event) {
         //     m_Running = false;
         //     event.consume();
         // });

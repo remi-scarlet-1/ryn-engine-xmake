@@ -64,7 +64,7 @@ namespace ryn {
         }
 
         // Be chatty about events that weren't consumed
-        if (!event.isConsumed()) RYN_TRACE("Event '{}' was not consumed by any layer", event.getTypeId().Name);
+        if (!event.isConsumed()) RYN_TRACE("Event '{}' was not consumed by any layer", event.getTypeName());
     }
 
     void ServiceStack::setEventInterceptor(EventInterceptor interceptor) { m_EventInterceptor = std::move(interceptor); }
@@ -73,11 +73,11 @@ namespace ryn {
         IService* service = serviceBox.get();
 
         if (m_ServiceLUT.contains(typeId)) {
-            RYN_ERROR("Failed to push service '{}' because an instance of it's type already exists!", service->getTypeId().Name);
+            RYN_ERROR("Failed to push service '{}' because an instance of it's type already exists!", service->getTypeName());
             return;
         }
 
-        RYN_INFO("Push service '{}'", service->getTypeId().Name);
+        RYN_INFO("Push service '{}'", service->getTypeName());
         m_ServiceLUT[typeId] = service;
         m_Services.push_back(std::move(serviceBox));
 
@@ -91,7 +91,7 @@ namespace ryn {
         auto& box     = m_Services.back();
         auto* service = box.get();
 
-        RYN_INFO("Pop service '{}'", service->getTypeId().Name);
+        RYN_INFO("Pop service '{}'", service->getTypeName());
         service->onDetach();
 
         m_ServiceLUT.erase(service->getTypeId());

@@ -10,8 +10,9 @@ namespace ryn {
     class RYN_API ITypeReflection {
     public:
         virtual ~ITypeReflection();
-        [[nodiscard]] virtual const TypeId&       getTypeId() const       = 0;
-        [[nodiscard]] virtual const TypeCategory& getTypeCategory() const = 0;
+        [[nodiscard]] virtual TypeId       getTypeId() const       = 0;
+        [[nodiscard]] virtual TypeCategory getTypeCategory() const = 0;
+        [[nodiscard]] virtual const char*  getTypeName() const     = 0;
     };
 }
 
@@ -68,13 +69,13 @@ export namespace ryn {
      * @tparam  Category The types classification (e.g., Component, System, Event).
      * @tparam  Name The unique string identifier used to generate the type's id.
      */
-    template<TypeCategory Category, TypeName Name>
+    template<const TypeCategory& Category, TypeName Name>
     struct StaticType {
         using MarkStaticType = void;
 
-        static constexpr auto        TYPE_ID       = TypeId(Name.data());
+        static constexpr auto        TYPE_ID       = TypeId(Name.value);
         static constexpr auto        TYPE_CATEGORY = Category;
-        static constexpr const char* TYPE_NAME     = Name.data;
+        static constexpr const char* TYPE_NAME     = Name.data();
 
         static bool registerType() {
             TypeRegistry::registerType(TypeInfo(TYPE_ID, TYPE_CATEGORY));
@@ -88,14 +89,14 @@ export namespace ryn {
      * @details Defines the shared category for an entire inheritance hierarchy.
      * @tparam  Category All derived types classification (e.g., Component, System, Event).
      */
-    template<TypeCategory Category>
+    template<const TypeCategory& Category>
     class DynamicBase : public ITypeReflection {
     public:
         using MarkDynamicType = void;
 
         static constexpr auto TYPE_CATEGORY = Category;
 
-        [[nodiscard]] const TypeCategory& getTypeCategory() const final { return TYPE_CATEGORY; }
+        [[nodiscard]] TypeCategory getTypeCategory() const final { return TYPE_CATEGORY; }
     };
 
     /**
@@ -116,8 +117,8 @@ export namespace ryn {
         using Meta::TYPE_ID;
         using Meta::TYPE_NAME;
 
-        [[nodiscard]] const TypeId& getTypeId() const final { return TYPE_ID; }
-        [[nodiscard]] const char*   getTypeName() const final { return TYPE_NAME; }
+        [[nodiscard]] TypeId      getTypeId() const final { return TYPE_ID; }
+        [[nodiscard]] const char* getTypeName() const final { return TYPE_NAME; }
 
     protected:
         constexpr DynamicType() noexcept { (void)s_Registered; }
